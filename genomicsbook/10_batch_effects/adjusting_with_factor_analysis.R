@@ -176,7 +176,7 @@ for(i in 1:ncol(svafit$sv)){
   print( cor(s$v[,i],svafit$sv[,i]) )
 }
 
-# fit linear model to each gene with these PC's
+# fit linear model based on sex (outcome of interest) + 5 factors from SVA
 
 svaX<-model.matrix(~sex + svafit$sv)
 lmfit <- lmFit(geneExpression,svaX)
@@ -187,7 +187,10 @@ res <- data.frame(dm= -lmfit$coef[,2],
 mypar(1,2)
 
 qvals <- qvalue(res$p.value)
-mean(qvals$qvalues<0.1)
 
+# how many have qval<0.1
+sum(qvals$qvalues<0.1)
+
+# on which chromosomes?
 genes_qval_below_0.1<-geneAnnotation[which(qvals$qvalues<0.1),]
 genes_qval_below_0.1
