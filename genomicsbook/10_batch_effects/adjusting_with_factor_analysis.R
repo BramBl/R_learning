@@ -1,11 +1,12 @@
 # when running on local
-.libPaths('C:/Users/BrBl1834/R/win-library')
+# .libPaths('C:/Users/BrBl1834/R/win-library')
 
 # load GSE5859subset
 wd<-getwd()
 load(paste0(wd,"/GSE5859Subset.rda"))
 
 
+# course rmd code ---------------------------------------------------------
 # plot images
 library(rafalib)
 library(RColorBrewer)
@@ -23,6 +24,9 @@ mat<-geneExpression[geneindex,]
 mat <- mat -rowMeans(mat)
 icolors <- colorRampPalette(rev(brewer.pal(11,"RdYlBu")))(100)
 mypar(1,2)
+
+
+
 
 # plot month and sex effects
 image(t(mat),xaxt="n",yaxt="n",col=icolors)
@@ -152,3 +156,37 @@ image(t(mat),col=icolors,zlim=c(-5,5),xaxt="n",yaxt="n")
 image(t(Signal),col=icolors,zlim=c(-5,5),xaxt="n",yaxt="n")
 image(t(Batch),col=icolors,zlim=c(-5,5),xaxt="n",yaxt="n")
 image(t(error),col=icolors,zlim=c(-5,5),xaxt="n",yaxt="n")
+
+
+# exercises ---------------------------------------------------------
+library(Biobase)
+
+# SVD: first factor highly correlates with sex
+s <- svd(geneExpression-rowMeans(geneExpression))
+cor(sampleInfo$group,s$v[,1])
+
+# SVA: estimate factors, but downweighs outcome of interest
+sex = sampleInfo$group
+mod = model.matrix(~sex)
+svafit = sva(geneExpression,mod)
+head(svafit$sv)
+
+# compare SVA factors with PC from SVD
+for(i in 1:ncol(svafit$sv)){
+  print( cor(s$v[,i],svafit$sv[,i]) )
+}
+
+# fit linear model to each gene with these PC's
+
+svaX<-model.matrix(~sex + svafit$sv)
+lmfit <- lmFit(geneExpression,svaX)
+tt<- lmfit$coef[,2]*sqrt(lmfit$df.residual)/(2*lmfit$sigma)
+
+res <- data.frame(dm= -lmfit$coef[,2],
+                  p.value=2*(1-pt(abs(tt),lmfit$df.residual[1]) ) )
+mypar(1,2)
+
+qvals <- qvalue(res$p.value)
+mean(qvals$qvalues<0.1)
+
+genes_qval_below_0.1<-geneAnnotation[which(qvals$qvalues<0.1),]
