@@ -190,3 +190,4 @@ qvals <- qvalue(res$p.value)
 mean(qvals$qvalues<0.1)
 
 genes_qval_below_0.1<-geneAnnotation[which(qvals$qvalues<0.1),]
+genes_qval_below_0.1
