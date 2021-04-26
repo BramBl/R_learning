@@ -86,6 +86,6 @@ setdiff(afterget, initdir)
 
 
 
-# SummarizedExperiment: accommodating more diverse feature concepts -------
+
 
 
