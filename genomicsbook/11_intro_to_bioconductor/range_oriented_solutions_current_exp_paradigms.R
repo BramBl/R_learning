@@ -92,3 +92,24 @@ library(RNAseqData.HNRNPC.bam.chr14)
 library(GenomicFiles)
 gf = GenomicFiles(files=RNAseqData.HNRNPC.bam.chr14_BAMFILES)
 gf
+
+# define GRanges object that contains the HNRNPC region of interest
+hn = GRanges("chr14", IRanges(21677296, 21737638), strand="-")
+rowRanges(gf) = hn
+
+# 
+library(GenomicAlignments)
+# define MAP function: extract alignments that overlaps the region of interest
+MAP = function(r, f) 
+  # read genomic alignments from BAM file
+  readGAlignmentPairs(f, param=ScanBamParam(which=r))
+ali = reduceByRange(gf, MAP=MAP)
+
+# length=number of reads aligned to the specified ROI (defined by hn or rowranges(gf)=GRanges object)
+sapply(ali[[1]], length)
+
+
+
+# BED collections ---------------------------------------------------------
+
+
