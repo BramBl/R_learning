@@ -56,7 +56,25 @@ table(airway$dex) # main treatment factor
 
 
 # run previous script from course to load the ArrayExpress for next part of exercise
-source("./management_genome_scale_exp.R")
-library(data.table)
-sd5797 = fread("E-MTAB-5797.sdrf.txt")
-head(sd5797[,c(3,16,18)])
+# source("./management_genome_scale_exp.R")
+# library(data.table)
+# sd5797 = fread("E-MTAB-5797.sdrf.txt")
+# head(sd5797[,c(3,16,18)])
+
+
+
+# External storage of large assay data - HDF5Array, saveHDF5Summar --------
+## Measuring memory consumption
+gc()
+
+## Demonstrating HDF5 for external storage
+library(HDF5Array)
+
+data(airway)
+airass = assay(airway)  # obtain numerical data, then save as HDF5
+href = writeHDF5Array(airass, "airass.h5", "airway")
+
+## HDF5-backed SummarizedExperiment
+saveHDF5SummarizedExperiment(airway, "externalAirway", replace=TRUE)
+newse = loadHDF5SummarizedExperiment("externalAirway")
+newse
