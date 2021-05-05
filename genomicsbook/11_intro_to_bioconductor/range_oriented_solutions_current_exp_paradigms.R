@@ -78,3 +78,17 @@ href = writeHDF5Array(airass, "airass.h5", "airway")
 saveHDF5SummarizedExperiment(airway, "externalAirway", replace=TRUE)
 newse = loadHDF5SummarizedExperiment("externalAirway")
 newse
+
+assay(newse[c("ENSG00000000005", "LRG_99"), 
+            which(newse$dex == "trt")]) # use familiar subsetting
+
+gc()
+
+
+
+# GenomicFiles: families of files of a given type -------------------------
+
+library(RNAseqData.HNRNPC.bam.chr14)
+library(GenomicFiles)
+gf = GenomicFiles(files=RNAseqData.HNRNPC.bam.chr14_BAMFILES)
+gf
